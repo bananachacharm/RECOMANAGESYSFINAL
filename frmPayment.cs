@@ -624,7 +624,7 @@ namespace RECOMANAGESYS
             {
                 string firstMonth = clbAdvanceMonths.CheckedItems[0].ToString();
                 string lastMonth = clbAdvanceMonths.CheckedItems[clbAdvanceMonths.CheckedItems.Count - 1].ToString();
-                lblMonthCovered.Text = $"{firstMonth} - {lastMonth}";
+                lblMonthCovered.Text = $" {firstMonth} - \n {lastMonth}";
             }
         }
         private void btnToggleSelectAll_Click(object sender, EventArgs e)
@@ -701,6 +701,16 @@ namespace RECOMANAGESYS
         private void clbAdvanceMonths_SelectedIndexChanged(object sender, EventArgs e) { }
 
         private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label12_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblAmountPaid_Click(object sender, EventArgs e)
         {
 
         }

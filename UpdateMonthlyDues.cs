@@ -30,6 +30,9 @@ namespace RECOMANAGESYS
             cmbUnits.SelectedIndexChanged += cmbUnits_SelectedIndexChanged;
             clbMissedMonths.ItemCheck += clbMissedMonths_ItemCheck;
             btnToggleSelectAll.Click += btnToggleSelectAll_Click;
+
+            // *** ADDED *** (This is the main fix)
+            cmbNames.SelectedIndexChanged += cmbNames_SelectedIndexChanged;
         }
         private void UpdateMonthlyDues_Load(object sender, EventArgs e)
         {
@@ -108,7 +111,7 @@ namespace RECOMANAGESYS
             {
                 conn.Open();
                 string residentQuery = @"SELECT ResidentID, FirstName, MiddleName, LastName FROM Residents  
-                                 WHERE HomeownerID = @homeownerId AND ResidencyType = 'Owner' AND IsActive = 1";
+                                        WHERE HomeownerID = @homeownerId AND ResidencyType = 'Owner' AND IsActive = 1";
                 using (SqlCommand cmd = new SqlCommand(residentQuery, conn))
                 {
                     cmd.Parameters.AddWithValue("@homeownerId", homeownerId);
@@ -161,6 +164,9 @@ namespace RECOMANAGESYS
                 cmbNames.Visible = true;
                 cmbNames.Enabled = false;
                 cmbNames.Text = "Select a unit first...";
+
+                // *** ADDED *** (Logic Fix 1)
+                lblResidentName.Text = "";
             }
         }
 
@@ -180,23 +186,23 @@ namespace RECOMANAGESYS
                 if (payerType == "Owner")
                 {
                     query = @"SELECT u.UnitID, u.UnitNumber, u.Block, r.HomeAddress
-                              FROM HomeownerUnits hu
-                              JOIN Residents r ON hu.ResidentID = r.ResidentID
-                              JOIN TBL_Units u ON hu.UnitID = u.UnitID
-                              WHERE hu.ResidentID = @ownerResidentId AND hu.IsCurrent = 1 AND r.ResidencyType = 'Owner'";
+                                FROM HomeownerUnits hu
+                                JOIN Residents r ON hu.ResidentID = r.ResidentID
+                                JOIN TBL_Units u ON hu.UnitID = u.UnitID
+                                WHERE hu.ResidentID = @ownerResidentId AND hu.IsCurrent = 1 AND r.ResidencyType = 'Owner'";
                 }
                 else
                 {
                     query = @"SELECT u.UnitID, u.UnitNumber, u.Block, r_owner.HomeAddress
-                              FROM TBL_Units u
-                              JOIN HomeownerUnits hu_owner ON u.UnitID = hu_owner.UnitID
-                              JOIN Residents r_owner ON hu_owner.ResidentID = r_owner.ResidentID
-                              WHERE hu_owner.ResidentID = @ownerResidentId AND hu_owner.IsCurrent = 1
-                              AND EXISTS (
-                                  SELECT 1 FROM HomeownerUnits hu_other
-                                  JOIN Residents r_other ON hu_other.ResidentID = r_other.ResidentID
-                                  WHERE hu_other.UnitID = u.UnitID AND r_other.ResidencyType = @payerType AND r_other.IsActive = 1
-                              )";
+                                FROM TBL_Units u
+                                JOIN HomeownerUnits hu_owner ON u.UnitID = hu_owner.UnitID
+                                JOIN Residents r_owner ON hu_owner.ResidentID = r_owner.ResidentID
+                                WHERE hu_owner.ResidentID = @ownerResidentId AND hu_owner.IsCurrent = 1
+                                AND EXISTS (
+                                    SELECT 1 FROM HomeownerUnits hu_other
+                                    JOIN Residents r_other ON hu_other.ResidentID = r_other.ResidentID
+                                    WHERE hu_other.UnitID = u.UnitID AND r_other.ResidencyType = @payerType AND r_other.IsActive = 1
+                                )";
                 }
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -290,7 +296,9 @@ namespace RECOMANAGESYS
                 }
             }
             cmbNames.Enabled = cmbNames.Items.Count > 0;
-            lblResidentName.Text = ownerFullName;
+
+            // *** MODIFIED *** (Logic Fix 2)
+            lblResidentName.Text = "Please select a name";
         }
 
         private void cmbNames_SelectedIndexChanged(object sender, EventArgs e)
@@ -459,7 +467,7 @@ namespace RECOMANAGESYS
                     string monthCovered = month.ToString();
 
                     string insertQuery = @"INSERT INTO MonthlyDues (ResidentID, UnitID, PaymentDate, AmountPaid, DueRate, MonthCovered, ProcessedByUserID, Remarks, PaidByResidencyType, PaidByResidentName)
-                                           VALUES (@residentId, @unitId, @paymentDate, @amountPaid, @dueRate, @monthCovered, @processedBy, @remarks, @paidByResidencyType, @paidByResidentName)";
+                                            VALUES (@residentId, @unitId, @paymentDate, @amountPaid, @dueRate, @monthCovered, @processedBy, @remarks, @paidByResidencyType, @paidByResidentName)";
                     using (SqlCommand cmd = new SqlCommand(insertQuery, conn))
                     {
                         cmd.Parameters.AddWithValue("@residentId", currentOwnerResidentId);

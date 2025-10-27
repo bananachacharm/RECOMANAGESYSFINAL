@@ -287,6 +287,7 @@
             this.lblAmountPaid.Size = new System.Drawing.Size(197, 27);
             this.lblAmountPaid.TabIndex = 38;
             this.lblAmountPaid.Text = "[pay monthly dues]";
+            this.lblAmountPaid.Click += new System.EventHandler(this.lblAmountPaid_Click);
             // 
             // label10
             // 
@@ -330,6 +331,7 @@
             this.label12.Size = new System.Drawing.Size(189, 27);
             this.label12.TabIndex = 43;
             this.label12.Text = "Amount Covered:";
+            this.label12.Click += new System.EventHandler(this.label12_Click);
             // 
             // cmbResidency
             // 
